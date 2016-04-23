@@ -67,9 +67,7 @@ MadeEngine::MadeEngine(OSystem *syst, const MadeGameDescription *gameDesc) : Eng
 
 	_console = new MadeConsole(this);
 
-	int cd_num = ConfMan.getInt("cdrom");
-	if (cd_num >= 0)
-		_system->getAudioCDManager()->openCD(cd_num);
+	_system->getAudioCDManager()->open();
 
 	_pmvPlayer = new PmvPlayer(this, _mixer);
 	_res = new ResourceReader();
@@ -270,12 +268,12 @@ void MadeEngine::handleEvents() {
 		}
 	}
 
-	_system->getAudioCDManager()->updateCD();
+	_system->getAudioCDManager()->update();
 
 }
 
 Common::Error MadeEngine::run() {
-	_music = new MusicPlayer();
+	_music = new MusicPlayer(getGameID() == GID_RTZ);
 	syncSoundSettings();
 
 	// Initialize backend

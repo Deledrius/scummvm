@@ -683,6 +683,8 @@ LauncherDialog::LauncherDialog()
 
 	// Create Load dialog
 	_loadDialog = new SaveLoadChooser(_("Load game:"), _("Load"), false);
+
+	GUI::GuiManager::instance()._launched = true;
 }
 
 void LauncherDialog::selectTarget(const String &target) {
@@ -1156,9 +1158,9 @@ void LauncherDialog::updateButtons() {
 		_loadButton->setEnabled(en);
 		_loadButton->draw();
 	}
-	switchButtonsText(_addButton, "~A~dd Game...", "Mass Add...");
+	switchButtonsText(_addButton, "~A~dd Game...", _s("Mass Add..."));
 #ifdef ENABLE_EVENTRECORDER
-	switchButtonsText(_loadButton, "~L~oad...", "Record...");
+	switchButtonsText(_loadButton, "~L~oad...", _s("Record..."));
 #endif
 }
 

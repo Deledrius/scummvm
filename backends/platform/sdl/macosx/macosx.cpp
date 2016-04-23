@@ -27,9 +27,10 @@
 
 #ifdef MACOSX
 
-#include "backends/platform/sdl/macosx/macosx.h"
+#include "backends/audiocd/macosx/macosx-audiocd.h"
 #include "backends/mixer/doublebuffersdl/doublebuffersdl-mixer.h"
 #include "backends/platform/sdl/macosx/appmenu_osx.h"
+#include "backends/platform/sdl/macosx/macosx.h"
 #include "backends/updates/macosx/macosx-updates.h"
 #include "backends/taskbar/macosx/macosx-taskbar.h"
 
@@ -47,6 +48,9 @@ OSystem_MacOSX::OSystem_MacOSX()
 }
 
 void OSystem_MacOSX::init() {
+	// Use an iconless window on OS X, as we use a nicer external icon there.
+	_window = new SdlIconlessWindow();
+
 #if defined(USE_TASKBAR)
 	// Initialize taskbar manager
 	_taskbarManager = new MacOSXTaskbarManager();
@@ -99,10 +103,6 @@ void OSystem_MacOSX::addSysArchivesToSearchSet(Common::SearchSet &s, int priorit
 		}
 		CFRelease(fileUrl);
 	}
-}
-
-void OSystem_MacOSX::setupIcon() {
-	// Don't set icon on OS X, as we use a nicer external icon there.
 }
 
 bool OSystem_MacOSX::hasFeature(Feature f) {
@@ -169,6 +169,10 @@ Common::String OSystem_MacOSX::getSystemLanguage() const {
 #else // USE_DETECTLANG
 	return OSystem_POSIX::getSystemLanguage();
 #endif // USE_DETECTLANG
+}
+
+AudioCDManager *OSystem_MacOSX::createAudioCDManager() {
+	return createMacOSXAudioCDManager();
 }
 
 #endif

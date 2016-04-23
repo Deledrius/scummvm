@@ -38,7 +38,11 @@ public:
 	virtual void init();
 	virtual void initBackend();
 	virtual void addSysArchivesToSearchSet(Common::SearchSet &s, int priority = 0);
-	virtual void setupIcon();
+
+protected:
+	// Override createAudioCDManager() to get our Mac-specific
+	// version.
+	virtual AudioCDManager *createAudioCDManager();
 };
 
 #endif

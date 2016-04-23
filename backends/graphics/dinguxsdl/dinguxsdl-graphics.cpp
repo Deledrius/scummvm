@@ -35,8 +35,12 @@ static const OSystem::GraphicsMode s_supportedGraphicsModes[] = {
 	{0, 0, 0}
 };
 
-DINGUXSdlGraphicsManager::DINGUXSdlGraphicsManager(SdlEventSource *boss)
-	: SurfaceSdlGraphicsManager(boss) {
+#ifndef USE_SCALERS
+#define DownscaleAllByHalf 0
+#endif
+
+DINGUXSdlGraphicsManager::DINGUXSdlGraphicsManager(SdlEventSource *boss, SdlWindow *window)
+	: SurfaceSdlGraphicsManager(boss, window) {
 }
 
 const OSystem::GraphicsMode *DINGUXSdlGraphicsManager::getSupportedGraphicsModes() const {
@@ -61,9 +65,11 @@ bool DINGUXSdlGraphicsManager::setGraphicsMode(int mode) {
 	case GFX_NORMAL:
 		newScaleFactor = 1;
 		break;
+#ifdef USE_SCALERS
 	case GFX_HALF:
 		newScaleFactor = 1;
 		break;
+#endif
 	default:
 		warning("unknown gfx mode %d", mode);
 		return false;
@@ -89,9 +95,11 @@ void DINGUXSdlGraphicsManager::setGraphicsModeIntern() {
 	case GFX_NORMAL:
 		newScalerProc = Normal1x;
 		break;
+#ifdef USE_SCALERS
 	case GFX_HALF:
 		newScalerProc = DownscaleAllByHalf;
 		break;
+#endif
 
 	default:
 		error("Unknown gfx mode %d", _videoMode.mode);
@@ -122,7 +130,7 @@ void DINGUXSdlGraphicsManager::initSize(uint w, uint h) {
 	if (w > 320 || h > 240) {
 		setGraphicsMode(GFX_HALF);
 		setGraphicsModeIntern();
-		_eventSource->toggleMouseGrab();
+		_window->toggleMouseGrab();
 	}
 
 	_transactionDetails.sizeChanged = true;

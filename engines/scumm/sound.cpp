@@ -35,9 +35,9 @@
 #include "scumm/resource.h"
 #include "scumm/scumm.h"
 #include "scumm/sound.h"
-#include "scumm/util.h"
 
-#include "audio/decoders/adpcm.h"
+#include "audio/audiostream.h"
+#include "audio/timestamp.h"
 #include "audio/decoders/flac.h"
 #include "audio/mididrv.h"
 #include "audio/mixer.h"
@@ -45,7 +45,6 @@
 #include "audio/decoders/raw.h"
 #include "audio/decoders/voc.h"
 #include "audio/decoders/vorbis.h"
-#include "audio/decoders/wave.h"
 
 namespace Scumm {
 
@@ -240,7 +239,7 @@ void Sound::playSound(int soundID) {
 		// mentioned in the bug report above; in case it is, I put a check here.
 		assert(soundID == 39);
 
-		// The samplerate is copied from the sound resouce 39 of the PC CD/VGA
+		// The samplerate is copied from the sound resource 39 of the PC CD/VGA
 		// version of Monkey Island.
 
 		// Read info from the header
@@ -1093,7 +1092,7 @@ int Sound::pollCD() const {
 
 void Sound::updateCD() {
 	if (!_isLoomSteam)
-		g_system->getAudioCDManager()->updateCD();
+		g_system->getAudioCDManager()->update();
 }
 
 AudioCDManager::Status Sound::getCDStatus() {

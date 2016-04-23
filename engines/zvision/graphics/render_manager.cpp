@@ -196,7 +196,7 @@ void RenderManager::readImageToSurface(const Common::String &fileName, Graphics:
 	uint32 imageHeight;
 	Image::TGADecoder tga;
 	uint16 *buffer;
-	// All ZVision images are in RGB 555
+	// All Z-Vision images are in RGB 555
 	destination.format = _engine->_resourcePixelFormat;
 
 	bool isTGZ;
@@ -1108,7 +1108,7 @@ void RenderManager::updateRotation() {
 			int16 newPosition = startPosition + _velocity;
 
 			int16 screenHeight = getBkgSize().y;
-			int16 tiltGap = _renderTable.getTiltGap();
+			int16 tiltGap = (int16)_renderTable.getTiltGap();
 
 			if (newPosition >= (screenHeight - tiltGap))
 				newPosition = screenHeight - tiltGap;
@@ -1143,7 +1143,7 @@ void RenderManager::checkBorders() {
 		int16 newPosition = startPosition;
 
 		int16 screenHeight = getBkgSize().y;
-		int16 tiltGap = _renderTable.getTiltGap();
+		int16 tiltGap = (int16)_renderTable.getTiltGap();
 
 		if (newPosition >= (screenHeight - tiltGap))
 			newPosition = screenHeight - tiltGap;

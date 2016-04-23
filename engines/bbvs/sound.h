@@ -23,9 +23,12 @@
 #ifndef BBVS_SOUND_H
 #define BBVS_SOUND_H
 
-#include "audio/audiostream.h"
 #include "audio/mixer.h"
 #include "common/array.h"
+
+namespace Audio {
+class RewindableAudioStream;
+}
 
 namespace Bbvs {
 
@@ -38,7 +41,7 @@ public:
 	void stop();
 	bool isPlaying();
 protected:
-	Audio::SeekableAudioStream *_stream;
+	Audio::RewindableAudioStream *_stream;
 	Audio::SoundHandle _handle;
 	// Keep the filename for debugging purposes
 	Common::String _filename;

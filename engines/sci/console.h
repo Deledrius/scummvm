@@ -68,6 +68,7 @@ private:
 	bool cmdSaid(int argc, const char **argv);
 	// Resources
 	bool cmdDiskDump(int argc, const char **argv);
+	void cmdDiskDumpWorker(ResourceType resourceType, int resourceNumber, uint32 resourceTuple);
 	bool cmdHexDump(int argc, const char **argv);
 	bool cmdResourceId(int argc, const char **argv);
 	bool cmdResourceInfo(int argc, const char **argv);
@@ -95,7 +96,9 @@ private:
 	bool cmdAnimateList(int argc, const char **argv);
 	bool cmdWindowList(int argc, const char **argv);
 	bool cmdPlaneList(int argc, const char **argv);
+	bool cmdVisiblePlaneList(int argc, const char **argv);
 	bool cmdPlaneItemList(int argc, const char **argv);
+	bool cmdVisiblePlaneItemList(int argc, const char **argv);
 	bool cmdSavedBits(int argc, const char **argv);
 	bool cmdShowSavedBits(int argc, const char **argv);
 	// Segments
@@ -136,6 +139,7 @@ private:
 	bool cmdSend(int argc, const char **argv);
 	bool cmdGo(int argc, const char **argv);
 	bool cmdLogKernel(int argc, const char **argv);
+	bool cmdMapVocab994(int argc, const char **argv);
 	// Breakpoints
 	bool cmdBreakpointList(int argc, const char **argv);
 	bool cmdBreakpointDelete(int argc, const char **argv);
@@ -146,6 +150,9 @@ private:
 	bool cmdBreakpointFunction(int argc, const char **argv);
 	// VM
 	bool cmdScriptSteps(int argc, const char **argv);
+	bool cmdScriptObjects(int argc, const char **argv);
+	bool cmdScriptStrings(int argc, const char **argv);
+	bool cmdScriptSaid(int argc, const char **argv);
 	bool cmdVMVarlist(int argc, const char **argv);
 	bool cmdVMVars(int argc, const char **argv);
 	bool cmdStack(int argc, const char **argv);
@@ -157,6 +164,7 @@ private:
 	bool cmdViewAccumulatorObject(int argc, const char **argv);
 
 	bool parseInteger(const char *argument, int &result);
+	bool parseResourceNumber36(const char *userParameter, uint16 &resourceNumber, uint32 &resourceTuple);
 
 	void printBasicVarInfo(reg_t variable);
 
@@ -164,6 +172,7 @@ private:
 	void printList(List *list);
 	int printNode(reg_t addr);
 	void hexDumpReg(const reg_t *data, int len, int regsPerLine = 4, int startOffset = 0, bool isArray = false);
+	void printOffsets(int scriptNr, uint16 showType);
 
 private:
 	/**

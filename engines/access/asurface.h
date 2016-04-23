@@ -27,7 +27,7 @@
 #include "common/array.h"
 #include "common/memstream.h"
 #include "common/rect.h"
-#include "graphics/surface.h"
+#include "graphics/managed_surface.h"
 #include "access/data.h"
 
 namespace Access {
@@ -35,7 +35,7 @@ namespace Access {
 class SpriteResource;
 class SpriteFrame;
 
-class ASurface : public Graphics::Surface {
+class ASurface : virtual public Graphics::ManagedSurface {
 private:
 	Graphics::Surface _savedBlock;
 
@@ -61,11 +61,7 @@ public:
 
 	virtual ~ASurface();
 
-	void create(uint16 width, uint16 height);
-
 	void clearBuffer();
-
-	bool clip(Common::Rect &r);
 
 	void plotImage(SpriteResource *sprite, int frameNum, const Common::Point &pt);
 
@@ -95,19 +91,15 @@ public:
 
 	virtual void drawRect();
 
-	virtual void transBlitFrom(ASurface *src, const Common::Point &destPos);
+	virtual void drawLine(int x1, int y1, int x2, int y2, int col);
 
-	virtual void transBlitFrom(ASurface *src, const Common::Rect &bounds);
+	virtual void drawLine();
 
-	virtual void transBlitFrom(ASurface &src);
+	virtual void drawBox();
 
-	virtual void blitFrom(Graphics::Surface &src);
+	virtual void copyBuffer(Graphics::ManagedSurface *src);
 
-	virtual void copyBuffer(Graphics::Surface *src);
-
-	virtual void addDirtyRect(const Common::Rect &r) {}
-
-	void copyTo(ASurface *dest) { dest->blitFrom(*this); }
+	void copyTo(ASurface *dest);
 
 	void saveBlock(const Common::Rect &bounds);
 
@@ -118,6 +110,8 @@ public:
 	void moveBufferUp();
 
 	void moveBufferDown();
+
+	bool clip(Common::Rect &r);
 };
 
 class SpriteFrame : public ASurface {

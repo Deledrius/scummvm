@@ -156,7 +156,7 @@ typedef Common::Array<synonym_t> SynonymList;
 struct AltInput {
 	const char *_input;
 	const char *_replacement;
-	unsigned int _inputLength;
+	uint32 _inputLength;
 	bool _prefix;
 };
 
@@ -231,6 +231,16 @@ public:
 	 *			language described by the grammar passed in 'rules'.
 	 */
 	int parseGNF(const ResultWordListList &words, bool verbose = false);
+
+	/**
+	 * Find and store reference for future pronouns
+	 */
+	bool storePronounReference();
+
+	/**
+	 * Replace pronouns by stored reference
+	 */
+	void replacePronouns(ResultWordListList &words);
 
 	/**
 	 * Constructs the Greibach Normal Form of the grammar supplied in 'branches'.
@@ -359,6 +369,8 @@ private:
 	WordMap _parserWords;
 	SynonymList _synonyms; /**< The list of synonyms */
 	Common::Array<Common::List<AltInput> > _altInputs;
+
+	int _pronounReference;
 
 public:
 	// Accessed by said()

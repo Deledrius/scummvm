@@ -74,6 +74,8 @@ Vocabulary::Vocabulary(ResourceManager *resMan, bool foreign) : _resMan(resMan),
 
 	parser_event = NULL_REG;
 	parserIsValid = false;
+
+	_pronounReference = 0x1000; // Non-existent word
 }
 
 Vocabulary::~Vocabulary() {
@@ -119,7 +121,7 @@ bool Vocabulary::loadParserWords() {
 		}
 	}
 
-	unsigned int seeker;
+	uint32 seeker;
 	if (resourceType == kVocabularySCI1)
 		seeker = 255 * 2; // vocab.900 starts with 255 16-bit pointers which we don't use
 	else
@@ -200,7 +202,7 @@ bool Vocabulary::loadSuffixes() {
 	if (!resource)
 		return false; // No vocabulary found
 
-	unsigned int seeker = 1;
+	uint32 seeker = 1;
 
 	while ((seeker < resource->size - 1) && (resource->data[seeker + 1] != 0xff)) {
 		suffix_t suffix;
@@ -286,7 +288,7 @@ bool Vocabulary::loadAltInputs() {
 		AltInput t;
 		t._input = data;
 
-		unsigned int l = strlen(data);
+		uint32 l = strlen(data);
 		t._inputLength = l;
 		data += l + 1;
 
@@ -323,15 +325,15 @@ bool Vocabulary::checkAltInput(Common::String& text, uint16& cursorPos) {
 		return false;
 
 	bool ret = false;
-	unsigned int loopCount = 0;
+	uint32 loopCount = 0;
 	bool changed;
 	do {
 		changed = false;
 
 		const char* t = text.c_str();
-		unsigned int tlen = text.size();
+		uint32 tlen = text.size();
 
-		for (unsigned int p = 0; p < tlen && !changed; ++p) {
+		for (uint32 p = 0; p < tlen && !changed; ++p) {
 			unsigned char s = t[p];
 			if (s >= _altInputs.size() || _altInputs[s].empty())
 				continue;
@@ -349,7 +351,7 @@ bool Vocabulary::checkAltInput(Common::String& text, uint16& cursorPos) {
 						cursorPos = p + strlen(i->_replacement);
 					}
 
-					for (unsigned int j = 0; j < i->_inputLength; ++j)
+					for (uint32 j = 0; j < i->_inputLength; ++j)
 						text.deleteChar(p);
 					const char *r = i->_replacement;
 					while (*r)
@@ -736,6 +738,81 @@ int Vocabulary::parseNodes(int *i, int *pos, int type, int nr, int argc, const c
 		con->debugPrintf("Expected ')' at token %d\n", *i);
 
 	return oldPos;
+}
+
+
+// FIXME: Duplicated from said.cpp
+static int node_major(ParseTreeNode* node) {
+	assert(node->type == kParseTreeBranchNode);
+	assert(node->left->type == kParseTreeLeafNode);
+	return node->left->value;
+}
+static bool node_is_terminal(ParseTreeNode* node) {
+	return (node->right->right &&
+            node->right->right->type != kParseTreeBranchNode);
+}
+static int node_terminal_value(ParseTreeNode* node) {
+	assert(node_is_terminal(node));
+	return node->right->right->value;
+}
+
+static ParseTreeNode* scanForMajor(ParseTreeNode *tree, int major) {
+	assert(tree);
+
+	if (node_is_terminal(tree)) {
+		if (node_major(tree) == major)
+			return tree;
+		else
+			return 0;
+	}
+
+	ParseTreeNode* ptr = tree->right;
+
+	// Scan children
+	while (ptr->right) {
+		ptr = ptr->right;
+
+		if (node_major(ptr->left) == major)
+			return ptr->left;
+	}
+
+	if (major == 0x141)
+		return 0;
+
+	// If not found, go into a 0x141 and try again
+	tree = scanForMajor(tree, 0x141);
+	if (!tree)
+		return 0;
+	return scanForMajor(tree, major);
+}
+
+bool Vocabulary::storePronounReference() {
+	assert(parserIsValid);
+
+	ParseTreeNode *ptr = scanForMajor(_parserNodes, 0x142); // 0x142 = object?
+
+	while (ptr && !node_is_terminal(ptr))
+		ptr = scanForMajor(ptr, 0x141);
+
+	if (!ptr)
+		return false;
+
+	_pronounReference = node_terminal_value(ptr);
+
+	debugC(kDebugLevelParser, "Stored pronoun reference: %x", _pronounReference);
+	return true;
+}
+
+void Vocabulary::replacePronouns(ResultWordListList &words) {
+	if (_pronounReference == 0x1000)
+		return;
+
+	for (ResultWordListList::iterator i = words.begin(); i != words.end(); ++i)
+		for (ResultWordList::iterator j = i->begin(); j != i->end(); ++j)
+			if (j->_class & (VOCAB_CLASS_PRONOUN << 4)) {
+				j->_class = VOCAB_CLASS_NOUN << 4;
+				j->_group = _pronounReference;
+			}
 }
 
 } // End of namespace Sci

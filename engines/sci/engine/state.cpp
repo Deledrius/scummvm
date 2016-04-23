@@ -92,6 +92,11 @@ void EngineState::reset(bool isRestoring) {
 		abortScriptProcessing = kAbortNone;
 	}
 
+	// reset delayed restore game functionality
+	_delayedRestoreGame = false;
+	_delayedRestoreGameId = 0;
+	_delayedRestoreFromLauncher = false;
+
 	executionStackBase = 0;
 	_executionStackPosChanged = false;
 	stack_base = 0;
@@ -125,8 +130,6 @@ void EngineState::reset(bool isRestoring) {
 
 	_vmdPalStart = 0;
 	_vmdPalEnd = 256;
-
-	_palCycleToColor = 255;
 }
 
 void EngineState::speedThrottler(uint32 neededSleep) {

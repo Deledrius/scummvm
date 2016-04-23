@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
-
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -25,6 +25,7 @@
 
 #include "common/scummsys.h"
 #include "common/array.h"
+#include "graphics/screen.h"
 #include "mads/msurface.h"
 #include "mads/action.h"
 
@@ -167,7 +168,7 @@ public:
 	/**
 	* Add a new item to the list
 	*/
-	void add(const Common::Rect &bounds, ScreenMode mode, ScrCategory category, int descId);
+	ScreenObject *add(const Common::Rect &bounds, ScreenMode mode, ScrCategory category, int descId);
 
 	/**
 	 * Check objects on the screen
@@ -207,11 +208,10 @@ public:
 	void synchronize(Common::Serializer &s);
 };
 
-class ScreenSurface : public MSurface {
+class Screen : virtual public Graphics::Screen, virtual public MSurface {
 private:
 	uint16 _random;
-	byte *_surfacePixels;
-	Common::Rect _clipBounds;
+	MSurface _rawSurface;
 
 	void panTransition(MSurface &newScreen, byte *palData, int entrySide,
 		const Common::Point &srcPos, const Common::Point &destPos,
@@ -226,36 +226,40 @@ public:
 	/**
 	 * Constructor
 	 */
-	ScreenSurface();
+	Screen();
 
 	/**
 	 * Destructor
 	 */
-	~ScreenSurface();
+	virtual ~Screen() {}
 
 	/**
-	 * Initialize the surface
+	 * Updates the physical screen with contents of the internal surface
 	 */
-	void init();
+	virtual void update();
 
 	/**
-	 * Copys an area of the screen surface to the ScmmVM physical screen buffer
-	 * @param bounds	Area of screen surface to copy
+	 * Transition to a new screen with a given effect
 	 */
-	void copyRectToScreen(const Common::Rect &bounds);
-
-	/**
-	 * Updates the screen with the contents of the surface
-	 */
-	void updateScreen();
-
 	void transition(ScreenTransition transitionType, bool surfaceFlag);
 
+	/**
+	 * Set the screen drawing area to a sub-section of the real screen
+	 */
 	void setClipBounds(const Common::Rect &r);
 
+	/**
+	 * Reset back to drawing on the entirety of the screen
+	 */
 	void resetClipBounds();
 
-	const Common::Rect &getClipBounds() { return _clipBounds; }
+	/**
+	 * Return the current drawing/clip area
+	 */
+	const Common::Rect getClipBounds() const { 
+		const Common::Point pt = getOffsetFromOwner();
+		return Common::Rect(pt.x, pt.y, pt.x + this->w, pt.y + this->h);
+	}
 };
 
 } // End of namespace MADS

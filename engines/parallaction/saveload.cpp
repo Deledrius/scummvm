@@ -25,10 +25,7 @@
 #include "common/textconsole.h"
 #include "common/translation.h"
 
-#include "gui/dialog.h"
 #include "gui/saveload.h"
-#include "gui/widget.h"
-#include "gui/widgets/list.h"
 #include "gui/message.h"
 
 #include "parallaction/parallaction.h"
@@ -194,7 +191,7 @@ int SaveLoad::selectSaveFile(Common::String &selectedName, bool saveMode, const 
 
 bool SaveLoad::loadGame() {
 	Common::String null;
-	int _di = selectSaveFile(null, false, "Load file", "Load");
+	int _di = selectSaveFile(null, false, _("Load file"), _("Load"));
 	if (_di == -1) {
 		return false;
 	}
@@ -209,7 +206,7 @@ bool SaveLoad::loadGame() {
 
 bool SaveLoad::saveGame() {
 	Common::String saveName;
-	int slot = selectSaveFile(saveName, true, "Save file", "Save");
+	int slot = selectSaveFile(saveName, true, _("Save file"), _("Save"));
 	if (slot == -1) {
 		return false;
 	}

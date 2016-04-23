@@ -123,7 +123,7 @@ bool StyledTTFont::loadFont(const Common::String &fontName, int32 point, uint st
 		!file.open(freeFontName) && !_engine->getSearchManager()->openFile(file, freeFontName))
 		error("Unable to open font file %s (Liberation Font alternative: %s, FreeFont alternative: %s)", newFontName.c_str(), liberationFontName.c_str(), freeFontName.c_str());
 
-	Graphics::Font *newFont = Graphics::loadTTFFont(file, point, 60, (sharp ? Graphics::kTTFRenderModeMonochrome : Graphics::kTTFRenderModeNormal)); // 66 dpi for 640 x 480 on 14" display
+	Graphics::Font *newFont = Graphics::loadTTFFont(file, point, Graphics::kTTFSizeModeCell, 0, (sharp ? Graphics::kTTFRenderModeMonochrome : Graphics::kTTFRenderModeNormal));
 	if (newFont == nullptr) {
 		return false;
 	}
@@ -199,12 +199,12 @@ void StyledTTFont::drawChar(Graphics::Surface *dst, byte chr, int x, int y, uint
 	if (_font) {
 		_font->drawChar(dst, chr, x, y, color);
 		if (_style & TTF_STYLE_UNDERLINE) {
-			int16 pos = floor(_font->getFontHeight() * 0.87);
+			int16 pos = (int16)floor(_font->getFontHeight() * 0.87);
 			int thk = MAX((int)(_font->getFontHeight() * 0.05), 1);
 			dst->fillRect(Common::Rect(x, y + pos, x + _font->getCharWidth(chr), y + pos + thk), color);
 		}
 		if (_style & TTF_STYLE_STRIKETHROUGH) {
-			int16 pos = floor(_font->getFontHeight() * 0.60);
+			int16 pos = (int16)floor(_font->getFontHeight() * 0.60);
 			int thk = MAX((int)(_font->getFontHeight() * 0.05), 1);
 			dst->fillRect(Common::Rect(x, y + pos, x + _font->getCharWidth(chr), y + pos + thk), color);
 		}
@@ -216,7 +216,7 @@ void StyledTTFont::drawString(Graphics::Surface *dst, const Common::String &str,
 		Common::U32String u32str = convertUtf8ToUtf32(str);
 		_font->drawString(dst, u32str, x, y, w, color, align);
 		if (_style & TTF_STYLE_UNDERLINE) {
-			int16 pos = floor(_font->getFontHeight() * 0.87);
+			int16 pos = (int16)floor(_font->getFontHeight() * 0.87);
 			int16 wd = MIN(_font->getStringWidth(u32str), w);
 			int16 stX = x;
 			if (align == Graphics::kTextAlignCenter)
@@ -229,7 +229,7 @@ void StyledTTFont::drawString(Graphics::Surface *dst, const Common::String &str,
 			dst->fillRect(Common::Rect(stX, y + pos, stX + wd, y + pos + thk), color);
 		}
 		if (_style & TTF_STYLE_STRIKETHROUGH) {
-			int16 pos = floor(_font->getFontHeight() * 0.60);
+			int16 pos = (int16)floor(_font->getFontHeight() * 0.60);
 			int16 wd = MIN(_font->getStringWidth(u32str), w);
 			int16 stX = x;
 			if (align == Graphics::kTextAlignCenter)
